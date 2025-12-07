@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>❓ Ajuda - Twitch Bot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .faq-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .faq-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .faq-answer.active {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-100">
+    <!-- Navbar -->
+    <nav class="glass border-b border-purple-500/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="/" class="text-2xl">🎮</a>
+                    <div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                            Central de Ajuda
+                        </h1>
+                    </div>
+                </div>
+                <a href="/" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
+                    ← Voltar
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">❓ Central de Ajuda</h1>
+                <p class="text-gray-400">Tire suas dúvidas sobre o Twitch Bot Dashboard</p>
+            </div>
+
+            <!-- Quick Start -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <span>🚀</span>
+                    <span>Início Rápido</span>
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-purple-600 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">
+                            1
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-2">Adicione um Streamer</h3>
+                            <p class="text-gray-400 text-sm">No painel esquerdo, digite o username da Twitch e clique em ➕</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <div class="bg-purple-600 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">
+                            2
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-2">Conecte ao Canal</h3>
+                            <p class="text-gray-400 text-sm">Clique em ▶️ START no card do streamer para conectar o bot</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <div class="bg-purple-600 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">
+                            3
+                        </div>
+                        <div>
+                            <h3 class="font-bold mb-2">Monitore o Chat</h3>
+                            <p class="text-gray-400 text-sm">Veja mensagens, logs e estatísticas em tempo real no dashboard</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <span>💡</span>
+                    <span>Perguntas Frequentes</span>
+                </h2>
+
+                <div class="space-y-3">
+                    <div class="faq-item bg-gray-800/50 rounded-lg p-4" onclick="toggleFaq(1)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold">Como o sistema de pontos funciona?</h3>
+                            <span class="text-2xl" id="icon-1">+</span>
+                        </div>
+                        <div class="faq-answer mt-4 text-gray-400 text-sm" id="answer-1">
+                            <p>Os usuários ganham pontos automaticamente por:</p>
+                            <ul class="list-disc ml-6 mt-2 space-y-1">
+                                <li>1 ponto por mensagem enviada</li>
+                                <li>Bônus de 10 pontos ao participar de uma raid</li>
+                                <li>Você pode criar comandos personalizados que dão/removem pontos</li>
+                            </ul>
+                            <p class="mt-2">Use o comando <code class="bg-gray-900 px-2 py-1 rounded">!pontos</code> para verificar</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-gray-800/50 rounded-lg p-4" onclick="toggleFaq(2)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold">O que são auto-respostas?</h3>
+                            <span class="text-2xl" id="icon-2">+</span>
+                        </div>
+                        <div class="faq-answer mt-4 text-gray-400 text-sm" id="answer-2">
+                            <p>Auto-respostas fazem o bot responder automaticamente quando detecta palavras-chave no chat.</p>
+                            <p class="mt-2"><strong>Exemplo:</strong></p>
+                            <ul class="list-disc ml-6 mt-2">
+                                <li>Gatilho: "oi" → Resposta: "Olá! Bem-vindo ao chat!"</li>
+                                <li>Gatilho: "discord" → Resposta: "Entre no nosso Discord: discord.gg/exemplo"</li>
+                            </ul>
+                            <p class="mt-2">Configure na aba 🤖 Auto Respostas</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-gray-800/50 rounded-lg p-4" onclick="toggleFaq(3)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold">Como adicionar comandos personalizados?</h3>
+                            <span class="text-2xl" id="icon-3">+</span>
+                        </div>
+                        <div class="faq-answer mt-4 text-gray-400 text-sm" id="answer-3">
+                            <p>Os comandos são definidos no código do bot. Comandos padrão incluem:</p>
+                            <ul class="list-disc ml-6 mt-2 space-y-1">
+                                <li><code class="bg-gray-900 px-2 py-1 rounded">!pontos</code> - Ver seus pontos</li>
+                                <li><code class="bg-gray-900 px-2 py-1 rounded">!top</code> - Ver ranking</li>
+                                <li><code class="bg-gray-900 px-2 py-1 rounded">!comandos</code> - Lista de comandos</li>
+                            </ul>
+                            <p class="mt-2">Para comandos avançados, edite o arquivo <code class="bg-gray-900 px-2 py-1 rounded">twitch_bot_class.py</code></p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-gray-800/50 rounded-lg p-4" onclick="toggleFaq(4)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold">O bot funciona em múltiplos canais?</h3>
+                            <span class="text-2xl" id="icon-4">+</span>
+                        </div>
+                        <div class="faq-answer mt-4 text-gray-400 text-sm" id="answer-4">
+                            <p><strong>Sim!</strong> O bot pode monitorar múltiplos canais simultaneamente.</p>
+                            <p class="mt-2">Cada canal mantém seus próprios:</p>
+                            <ul class="list-disc ml-6 mt-2">
+                                <li>Pontos de usuários</li>
+                                <li>Estatísticas</li>
+                                <li>Configurações de auto-resposta</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-gray-800/50 rounded-lg p-4" onclick="toggleFaq(5)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold">Como configurar integrações?</h3>
+                            <span class="text-2xl" id="icon-5">+</span>
+                        </div>
+                        <div class="faq-answer mt-4 text-gray-400 text-sm" id="answer-5">
+                            <p>Acesse a página 🔌 Integrações no menu dropdown do navbar.</p>
+                            <p class="mt-2">Integrações disponíveis:</p>
+                            <ul class="list-disc ml-6 mt-2 space-y-1">
+                                <li><strong>Discord:</strong> Envie notificações para um canal</li>
+                                <li><strong>Minecraft:</strong> Execute comandos via RCON</li>
+                                <li><strong>Email:</strong> Receba alertas por email</li>
+                                <li><strong>Reconhecimento de Voz:</strong> Controle por comandos de voz</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item bg-gray-800/50 rounded-lg p-4" onclick="toggleFaq(6)">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold">Os dados são salvos automaticamente?</h3>
+                            <span class="text-2xl" id="icon-6">+</span>
+                        </div>
+                        <div class="faq-answer mt-4 text-gray-400 text-sm" id="answer-6">
+                            <p><strong>Sim!</strong> O bot salva automaticamente:</p>
+                            <ul class="list-disc ml-6 mt-2">
+                                <li>Pontos dos usuários</li>
+                                <li>Contagem de mensagens</li>
+                                <li>Auto-respostas configuradas</li>
+                            </ul>
+                            <p class="mt-2">Os dados ficam na pasta <code class="bg-gray-900 px-2 py-1 rounded">data/</code></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comandos do Bot -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <span>⌨️</span>
+                    <span>Comandos Disponíveis</span>
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <code class="text-green-400 font-bold">!pontos</code>
+                        <p class="text-sm text-gray-400 mt-2">Mostra quantos pontos você tem</p>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <code class="text-green-400 font-bold">!top</code>
+                        <p class="text-sm text-gray-400 mt-2">Ranking dos 10 usuários com mais pontos</p>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <code class="text-green-400 font-bold">!comandos</code>
+                        <p class="text-sm text-gray-400 mt-2">Lista todos os comandos disponíveis</p>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <code class="text-green-400 font-bold">!uptime</code>
+                        <p class="text-sm text-gray-400 mt-2">Há quanto tempo o bot está conectado</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <span>🔧</span>
+                    <span>Solução de Problemas</span>
+                </h2>
+
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-bold mb-2 text-red-400">❌ Bot não conecta ao canal</h3>
+                        <ul class="text-sm text-gray-400 list-disc ml-6 space-y-1">
+                            <li>Verifique se o token OAuth está configurado corretamente</li>
+                            <li>Certifique-se de que o username está correto (sem @)</li>
+                            <li>Confira os logs na aba 📋 Logs para detalhes do erro</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold mb-2 text-yellow-400">⚠️ Mensagens não aparecem</h3>
+                        <ul class="text-sm text-gray-400 list-disc ml-6 space-y-1">
+                            <li>Recarregue a página (F5)</li>
+                            <li>Verifique a conexão WebSocket no console do navegador</li>
+                            <li>Tente desconectar e reconectar o bot</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold mb-2 text-blue-400">ℹ️ Pontos não estão salvando</h3>
+                        <ul class="text-sm text-gray-400 list-disc ml-6 space-y-1">
+                            <li>Verifique se a pasta <code class="bg-gray-900 px-2 rounded">data/</code> existe</li>
+                            <li>Confirme permissões de escrita na pasta</li>
+                            <li>Os dados são salvos ao desconectar o bot</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suporte -->
+            <div class="glass rounded-xl p-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <span>📞</span>
+                    <span>Precisa de mais ajuda?</span>
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-purple-900/30 rounded-lg p-4 text-center">
+                        <div class="text-3xl mb-2">📚</div>
+                        <h3 class="font-bold mb-2">Documentação</h3>
+                        <p class="text-sm text-gray-400">Consulte a documentação completa</p>
+                    </div>
+
+                    <div class="bg-blue-900/30 rounded-lg p-4 text-center">
+                        <div class="text-3xl mb-2">💬</div>
+                        <h3 class="font-bold mb-2">Comunidade</h3>
+                        <p class="text-sm text-gray-400">Entre no nosso Discord</p>
+                    </div>
+
+                    <div class="bg-green-900/30 rounded-lg p-4 text-center">
+                        <div class="text-3xl mb-2">🐛</div>
+                        <h3 class="font-bold mb-2">Reportar Bug</h3>
+                        <p class="text-sm text-gray-400">Envie um relatório de bug</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFaq(id) {
+            const answer = document.getElementById(`answer-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            
+            if (answer.classList.contains('active')) {
+                answer.classList.remove('active');
+                icon.textContent = '+';
+            } else {
+                // Fechar todos
+                document.querySelectorAll('.faq-answer').forEach(a => {
+                    a.classList.remove('active');
+                });
+                document.querySelectorAll('[id^="icon-"]').forEach(i => {
+                    i.textContent = '+';
+                });
+                
+                // Abrir este
+                answer.classList.add('active');
+                icon.textContent = '−';
+            }
+        }
+    </script>
+</body>
+</html>

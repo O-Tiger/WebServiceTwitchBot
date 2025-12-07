@@ -1,0 +1,400 @@
+/* ===== DASHBOARD STYLES ===== */
+
+/* Navbar */
+nav {
+    position: relative;
+    z-index: 9998;
+}
+
+nav .glass {
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* Status Indicator */
+#status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#status-indicator .status-dot {
+    animation: pulse 2s infinite;
+}
+
+/* Sidebar - Streamers */
+.streamers-sidebar {
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+}
+
+.streamer-card {
+    background: rgba(31, 41, 55, 0.5);
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.streamer-card:hover {
+    background: rgba(55, 65, 81, 0.5);
+    transform: translateX(4px);
+}
+
+.streamer-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.streamer-status-dot.online {
+    background: var(--success);
+}
+
+.streamer-status-dot.offline {
+    background: var(--text-dim);
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.stat-card {
+    background: var(--surface-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+}
+
+/* Tabs */
+.tabs-container {
+    overflow: hidden;
+}
+
+.tabs-header {
+    display: flex;
+    border-bottom: 1px solid rgba(107, 114, 128, 1);
+}
+
+.tab-button {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+    background: rgba(55, 65, 81, 0.5);
+}
+
+.tab-button.active {
+    background: var(--purple-600);
+    color: white;
+}
+
+.tab-content {
+    padding: 1.5rem;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+/* Chat Messages */
+#chat-messages {
+    background: rgba(17, 24, 39, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    height: 384px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+#chat-messages .chat-line {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+#chat-messages .chat-line.own-message {
+    color: var(--purple-400);
+}
+
+#chat-messages .chat-timestamp {
+    color: var(--text-dim);
+}
+
+#chat-messages .chat-channel {
+    color: var(--info);
+    font-weight: bold;
+}
+
+#chat-messages .chat-username {
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+#chat-messages .chat-message {
+    color: var(--text-secondary);
+}
+
+/* Chat Input */
+.chat-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input-group select {
+    background: rgba(31, 41, 55, 1);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--text-primary);
+}
+
+.chat-input-group input {
+    flex: 1;
+    background: rgba(31, 41, 55, 1);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--text-primary);
+}
+
+.chat-input-group button {
+    background: var(--purple-600);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.chat-input-group button:hover {
+    background: var(--purple-700);
+}
+
+/* Logs */
+#log-messages {
+    background: rgba(17, 24, 39, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    height: 384px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+}
+
+#log-messages .log-line {
+    margin-bottom: 0.25rem;
+}
+
+#log-messages .log-line.success {
+    color: var(--success);
+}
+
+#log-messages .log-line.error {
+    color: var(--error);
+}
+
+#log-messages .log-line.warning {
+    color: var(--warning);
+}
+
+#log-messages .log-line.info {
+    color: var(--info);
+}
+
+#log-messages .log-line.bot {
+    color: var(--purple-400);
+}
+
+#log-messages .log-line.event {
+    color: var(--pink-400);
+}
+
+/* Auto Responses */
+.auto-response-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.auto-response-form input {
+    background: rgba(31, 41, 55, 1);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--text-primary);
+}
+
+#responses-list {
+    background: rgba(17, 24, 39, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    height: 320px;
+    overflow-y: auto;
+}
+
+.response-item {
+    background: rgba(31, 41, 55, 1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+}
+
+.response-item:hover {
+    background: rgba(55, 65, 81, 1);
+}
+
+.response-trigger {
+    font-family: 'Courier New', monospace;
+    color: var(--purple-400);
+    font-weight: bold;
+}
+
+.response-text {
+    font-family: 'Courier New', monospace;
+    color: var(--success);
+}
+
+/* Voice Recognition Button */
+.voice-toggle-btn {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--purple-600);
+    color: white;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.voice-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.6);
+}
+
+.voice-toggle-btn.active {
+    background: var(--error);
+    animation: pulse 2s infinite;
+}
+
+.voice-toggle-btn.listening {
+    background: var(--success);
+    animation: pulse 1s infinite;
+}
+
+/* Raid Notification */
+.raid-notification {
+    position: fixed;
+    top: 5rem;
+    right: 2rem;
+    padding: 2rem;
+    border-radius: 12px;
+    background: linear-gradient(to right, var(--purple-600), var(--pink-500));
+    color: white;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    animation: fadeIn 0.5s ease;
+}
+
+.raid-notification .raid-icon {
+    font-size: 3rem;
+}
+
+.raid-notification .raid-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.raid-notification .raid-message {
+    font-size: 1.125rem;
+}
+
+.raid-notification .raid-channel {
+    font-size: 0.875rem;
+    opacity: 0.75;
+    margin-top: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .sidebar {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .auto-response-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .voice-toggle-btn {
+        width: 56px;
+        height: 56px;
+        font-size: 1.25rem;
+    }
+}
+
+/* Debug Mode Styles */
+body.debug-mode::before {
+    content: '🐛 DEBUG MODE';
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: var(--error);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 10000;
+    animation: pulse 2s infinite;
+}

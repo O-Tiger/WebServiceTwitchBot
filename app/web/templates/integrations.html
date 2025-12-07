@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔌 Integrações - Twitch Bot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .integration-card {
+            transition: all 0.3s ease;
+        }
+        .integration-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(145, 71, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-100">
+    <!-- Navbar -->
+    <nav class="glass border-b border-purple-500/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <a href="/" class="text-2xl">🎮</a>
+                    <div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                            Integrações
+                        </h1>
+                    </div>
+                </div>
+                <a href="/" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
+                    ← Voltar
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">🔌 Gerenciamento de Integrações</h1>
+                <p class="text-gray-400">Conecte seu bot com Discord, Minecraft, Email e mais!</p>
+            </div>
+
+            <!-- Grid de Integrações -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Discord -->
+                <div class="integration-card glass rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-4xl">💬</div>
+                            <h2 class="text-2xl font-bold">Discord</h2>
+                        </div>
+                        <div class="bg-red-600 text-xs px-3 py-1 rounded-full">Desativado</div>
+                    </div>
+                    
+                    <p class="text-gray-400 mb-4">
+                        Envie notificações e mensagens para um canal do Discord quando eventos ocorrerem no chat da Twitch.
+                    </p>
+
+                    <div class="space-y-3 mb-4">
+                        <input type="text" placeholder="Bot Token" 
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="text" placeholder="Channel ID" 
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button class="flex-1 bg-purple-600 hover:bg-purple-700 py-2 rounded-lg transition">
+                            💾 Salvar
+                        </button>
+                        <button class="px-4 bg-gray-700 hover:bg-gray-600 py-2 rounded-lg transition">
+                            🧪 Testar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Minecraft -->
+                <div class="integration-card glass rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-4xl">⛏️</div>
+                            <h2 class="text-2xl font-bold">Minecraft</h2>
+                        </div>
+                        <div class="bg-red-600 text-xs px-3 py-1 rounded-full">Desativado</div>
+                    </div>
+                    
+                    <p class="text-gray-400 mb-4">
+                        Execute comandos no servidor Minecraft (RCON) quando eventos ocorrerem na Twitch.
+                    </p>
+
+                    <div class="space-y-3 mb-4">
+                        <input type="text" placeholder="Host (ex: localhost)" value="localhost"
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="number" placeholder="Porta" value="25575"
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="password" placeholder="Senha RCON" 
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button class="flex-1 bg-green-600 hover:bg-green-700 py-2 rounded-lg transition">
+                            💾 Salvar
+                        </button>
+                        <button class="px-4 bg-gray-700 hover:bg-gray-600 py-2 rounded-lg transition">
+                            🧪 Testar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="integration-card glass rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-4xl">📧</div>
+                            <h2 class="text-2xl font-bold">Email</h2>
+                        </div>
+                        <div class="bg-red-600 text-xs px-3 py-1 rounded-full">Desativado</div>
+                    </div>
+                    
+                    <p class="text-gray-400 mb-4">
+                        Receba notificações por email sobre eventos importantes da live.
+                    </p>
+
+                    <div class="space-y-3 mb-4">
+                        <input type="text" placeholder="Servidor SMTP" value="smtp.gmail.com"
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="number" placeholder="Porta" value="587"
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="email" placeholder="Seu Email" 
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="password" placeholder="Senha do Email" 
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg transition">
+                        💾 Salvar
+                    </button>
+                </div>
+
+                <!-- Twitch API -->
+                <div class="integration-card glass rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-4xl">📊</div>
+                            <h2 class="text-2xl font-bold">Twitch API</h2>
+                        </div>
+                        <div class="bg-red-600 text-xs px-3 py-1 rounded-full">Desativado</div>
+                    </div>
+                    
+                    <p class="text-gray-400 mb-4">
+                        Acesse dados avançados: seguidores, subscribers, informações de usuários.
+                    </p>
+
+                    <div class="space-y-3 mb-4">
+                        <input type="text" placeholder="Client ID" 
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="password" placeholder="Client Secret" 
+                            class="w-full bg-gray-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 py-2 rounded-lg transition">
+                        💾 Salvar
+                    </button>
+                </div>
+
+                <!-- Reconhecimento de Voz -->
+                <div class="integration-card glass rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-4xl">🎤</div>
+                            <h2 class="text-2xl font-bold">Reconhecimento de Voz</h2>
+                        </div>
+                        <div id="voice-status" class="bg-red-600 text-xs px-3 py-1 rounded-full">🔴 Desativado</div>
+                    </div>
+                    
+                    <p class="text-gray-400 mb-4">
+                        Controle o bot com sua voz durante a live! Diga "bot" + comando.
+                    </p>
+
+                    <div class="bg-gray-800 rounded-lg p-4 mb-4 max-h-40 overflow-y-auto">
+                        <div class="text-xs space-y-1">
+                            <div class="text-gray-500">Comandos disponíveis:</div>
+                            <div class="text-green-400">• bot ler chat</div>
+                            <div class="text-green-400">• bot obrigado</div>
+                            <div class="text-green-400">• bot quantos viewers</div>
+                            <div class="text-green-400">• bot enviar mensagem [texto]</div>
+                        </div>
+                    </div>
+
+                    <button id="toggle-voice" onclick="toggleVoice()" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded-lg transition">
+                        🎤 Ativar Reconhecimento
+                    </button>
+                </div>
+
+                <!-- Importar Dados -->
+                <div class="integration-card glass rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-4xl">📥</div>
+                            <h2 class="text-2xl font-bold">Importar Dados</h2>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-400 mb-4">
+                        Importe pontos do StreamElements, Nightbot ou outros bots.
+                    </p>
+
+                    <div class="space-y-3">
+                        <button class="w-full bg-orange-600 hover:bg-orange-700 py-2 rounded-lg transition flex items-center justify-center gap-2">
+                            <span>📄</span>
+                            <span>Importar StreamElements (CSV)</span>
+                        </button>
+                        <button class="w-full bg-indigo-600 hover:bg-indigo-700 py-2 rounded-lg transition flex items-center justify-center gap-2">
+                            <span>📋</span>
+                            <span>Importar Nightbot (JSON)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="glass rounded-xl p-6 mt-8">
+                <h3 class="text-xl font-bold mb-4">ℹ️ Informações</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
+                    <div>
+                        <h4 class="font-bold text-white mb-2">Discord</h4>
+                        <p>Crie um bot em <a href="https://discord.com/developers/applications" target="_blank" class="text-purple-400 hover:underline">discord.com/developers</a> e obtenha o token.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-white mb-2">Minecraft RCON</h4>
+                        <p>Ative RCON no server.properties: <code class="bg-gray-800 px-2 py-1 rounded">enable-rcon=true</code></p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-white mb-2">Email</h4>
+                        <p>Para Gmail, use senha de app. Gere em: Configurações → Segurança → Senhas de app</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-white mb-2">Twitch API</h4>
+                        <p>Registre app em <a href="https://dev.twitch.tv/console" target="_blank" class="text-purple-400 hover:underline">dev.twitch.tv/console</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let voiceEnabled = false;
+
+        function toggleVoice() {
+            voiceEnabled = !voiceEnabled;
+            const btn = document.getElementById('toggle-voice');
+            const status = document.getElementById('voice-status');
+            
+            if (voiceEnabled) {
+                btn.textContent = '🔴 Desativar Reconhecimento';
+                btn.className = 'w-full bg-green-600 hover:bg-green-700 py-2 rounded-lg transition';
+                status.textContent = '🟢 Escutando';
+                status.className = 'bg-green-600 text-xs px-3 py-1 rounded-full';
+            } else {
+                btn.textContent = '🎤 Ativar Reconhecimento';
+                btn.className = 'w-full bg-red-600 hover:bg-red-700 py-2 rounded-lg transition';
+                status.textContent = '🔴 Desativado';
+                status.className = 'bg-red-600 text-xs px-3 py-1 rounded-full';
+            }
+        }
+    </script>
+</body>
+</html>

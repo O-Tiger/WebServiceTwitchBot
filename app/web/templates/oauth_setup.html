@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar OAuth - {{ provider|title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center text-gray-100 p-4">
+    <div class="w-full max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="text-6xl mb-4">
+                {% if provider == 'google' %}🔵
+                {% elif provider == 'twitch' %}🟣
+                {% elif provider == 'github' %}⚫
+                {% elif provider == 'discord' %}🔵
+                {% endif %}
+            </div>
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                Configurar {{ provider|title }} OAuth
+            </h1>
+            <p class="text-gray-400">Configure as credenciais para habilitar login social</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Tutorial -->
+            <div class="glass rounded-2xl p-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <span>📚</span>
+                    <span>{{ tutorial.title }}</span>
+                </h2>
+
+                <div class="space-y-4 mb-6">
+                    {% for step in tutorial.steps %}
+                    <div class="flex items-start gap-3">
+                        <div class="bg-purple-600 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold mt-1">
+                            {{ loop.index }}
+                        </div>
+                        <p class="text-sm text-gray-300">{{ step }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Links úteis -->
+                <div class="bg-blue-900/20 border border-blue-500 rounded-lg p-4 mb-4">
+                    <p class="text-blue-300 text-sm font-bold mb-2">🔗 Links úteis:</p>
+                    <div class="space-y-2 text-xs">
+                        {% if provider == 'google' %}
+                        <a href="https://console.cloud.google.com" target="_blank" 
+                           class="block text-blue-400 hover:underline">
+                            → Google Cloud Console
+                        </a>
+                        {% elif provider == 'twitch' %}
+                        <a href="https://dev.twitch.tv/console/apps" target="_blank"
+                           class="block text-purple-400 hover:underline">
+                            → Twitch Developer Console
+                        </a>
+                        {% elif provider == 'github' %}
+                        <a href="https://github.com/settings/developers" target="_blank"
+                           class="block text-gray-400 hover:underline">
+                            → GitHub Developer Settings
+                        </a>
+                        {% elif provider == 'discord' %}
+                        <a href="https://discord.com/developers/applications" target="_blank"
+                           class="block text-indigo-400 hover:underline">
+                            → Discord Developer Portal
+                        </a>
+                        {% endif %}
+                        <a href="{{ tutorial.docs }}" target="_blank"
+                           class="block text-gray-400 hover:underline">
+                            → Documentação Oficial
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Redirect URI -->
+                <div class="bg-yellow-900/20 border border-yellow-500 rounded-lg p-4">
+                    <p class="text-yellow-300 text-sm font-bold mb-2">⚠️ Redirect URI:</p>
+                    <div class="flex items-center gap-2">
+                        <code id="redirect-uri" class="flex-1 bg-gray-900 px-3 py-2 rounded text-xs text-green-400">
+                            {{ tutorial.redirect_uri }}
+                        </code>
+                        <button onclick="copyRedirectUri()" 
+                                class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-xs transition">
+                            📋 Copiar
+                        </button>
+                    </div>
+                    <p class="text-yellow-200 text-xs mt-2">
+                        Cole este endereço exatamente como está nas configurações do {{ provider|title }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <div class="glass rounded-2xl p-8">
+                <h2 class="text-2xl font-bold mb-6">Credenciais</h2>
+
+                {% if error %}
+                <div class="bg-red-500/10 border border-red-500 rounded-lg p-4 mb-6">
+                    <p class="text-red-400 text-sm">❌ {{ error }}</p>
+                </div>
+                {% endif %}
+
+                <form method="POST" action="/oauth/setup/{{ provider }}">
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2 text-gray-300">
+                            🔑 Client ID
+                        </label>
+                        <input 
+                            type="text" 
+                            name="client_id"
+                            placeholder="Cole seu Client ID aqui"
+                            required
+                            value="{{ config.client_id }}"
+                            class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500 transition font-mono text-sm"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">
+                            ID público da sua aplicação OAuth
+                        </p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2 text-gray-300">
+                            🔐 Client Secret
+                        </label>
+                        <input 
+                            type="password" 
+                            name="client_secret"
+                            placeholder="Cole seu Client Secret aqui"
+                            required
+                            class="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500 transition font-mono text-sm"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">
+                            Chave secreta (nunca compartilhe!)
+                        </p>
+                    </div>
+
+                    <button 
+                        type="submit"
+                        class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 rounded-lg transition transform hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                        💾 Salvar e Continuar
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-gray-700">
+                    <a href="/login" class="text-center block text-gray-400 hover:text-white transition text-sm">
+                        ← Voltar ao Login
+                    </a>
+                </div>
+
+                <!-- Status Info -->
+                <div class="mt-6 bg-gray-800/50 rounded-lg p-4">
+                    <h3 class="text-sm font-bold mb-3 text-gray-300">📊 Status Atual:</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Client ID:</span>
+                            <span class="{% if config.client_id %}text-green-400{% else %}text-red-400{% endif %}">
+                                {% if config.client_id %}✓ Configurado{% else %}✗ Não configurado{% endif %}
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Client Secret:</span>
+                            <span class="{% if config.client_secret %}text-green-400{% else %}text-red-400{% endif %}">
+                                {% if config.client_secret %}✓ Configurado{% else %}✗ Não configurado{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="glass rounded-xl p-6 mt-6">
+            <h3 class="text-lg font-bold mb-4">💡 Dicas Importantes</h3>
+            <ul class="space-y-2 text-sm text-gray-400">
+                <li class="flex items-start gap-2">
+                    <span>•</span>
+                    <span>Mantenha o Client Secret em segurança. Nunca o compartilhe publicamente.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span>•</span>
+                    <span>O Redirect URI deve ser exatamente igual ao configurado na aplicação OAuth.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span>•</span>
+                    <span>Se estiver em produção, use HTTPS e atualize os URIs.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span>•</span>
+                    <span>Após salvar, você será redirecionado para completar o login.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function copyRedirectUri() {
+            const uri = document.getElementById('redirect-uri').textContent;
+            navigator.clipboard.writeText(uri).then(() => {
+                // Toast de sucesso
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-8 right-8 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                toast.textContent = '✅ Redirect URI copiado!';
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.transition = 'opacity 0.3s';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Dependências Flask - Twitch Bot Dashboard
+
+# Framework Web
+Flask==3.0.0
+flask-socketio==5.3.5
+
+# Twitch
+twitchio==2.9.1
+
+# HTTP Requests
+requests==2.31.0
+
+# WebSocket
+python-socketio==5.10.0
+python-engineio==4.8.0
+
+# Async
+asyncio
+
+# Servidor WSGI (Produção)
+gunicorn==21.2.0
+eventlet==0.33.3
+
+# Integrações Opcionais
+# discord.py==2.3.2  # Para integração Discord
+# mcrcon==0.7.0      # Para Minecraft RCON
+# SpeechRecognition==3.10.0  # Reconhecimento de voz
+# pyttsx3==2.90      # Text-to-Speech
+# pyaudio==0.2.14    # Audio
+
+# Utilidades
+python-dotenv==1.0.0

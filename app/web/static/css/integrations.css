@@ -1,0 +1,356 @@
+/* ===== INTEGRATIONS PAGE STYLES ===== */
+
+.integrations-container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Header */
+.integrations-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.integrations-header h1 {
+    font-size: 2.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.integrations-header p {
+    color: var(--text-secondary);
+}
+
+/* Grid de Integrações */
+.integrations-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+/* Cards de Integração */
+.integration-card {
+    background: var(--surface-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.integration-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(145, 71, 255, 0.2);
+}
+
+.integration-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.integration-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.integration-icon {
+    font-size: 2.5rem;
+}
+
+.integration-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.integration-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+.integration-status.active {
+    background: var(--success);
+    color: white;
+}
+
+.integration-status.inactive {
+    background: var(--error);
+    color: white;
+}
+
+.integration-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+/* Formulários de Integração */
+.integration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.integration-form input,
+.integration-form select {
+    width: 100%;
+    background: rgba(31, 41, 55, 1);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.integration-form input:focus,
+.integration-form select:focus {
+    outline: none;
+    ring: 2px solid var(--purple-500);
+}
+
+.integration-form input::placeholder {
+    color: var(--text-dim);
+}
+
+/* Botões de Integração */
+.integration-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.integration-btn {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.integration-btn.save {
+    background: var(--purple-600);
+    color: white;
+}
+
+.integration-btn.save:hover {
+    background: var(--purple-700);
+}
+
+.integration-btn.test {
+    background: rgba(55, 65, 81, 1);
+    color: white;
+    padding: 0.5rem 1rem;
+}
+
+.integration-btn.test:hover {
+    background: rgba(75, 85, 99, 1);
+}
+
+/* Discord */
+.integration-card.discord .integration-btn.save {
+    background: var(--purple-600);
+}
+
+/* Minecraft */
+.integration-card.minecraft .integration-btn.save {
+    background: var(--success);
+}
+
+.integration-card.minecraft .integration-btn.save:hover {
+    background: #059669;
+}
+
+/* Email */
+.integration-card.email .integration-btn.save {
+    background: var(--info);
+}
+
+.integration-card.email .integration-btn.save:hover {
+    background: #2563eb;
+}
+
+/* Twitch API */
+.integration-card.twitch-api .integration-btn.save {
+    background: var(--purple-600);
+}
+
+/* Voice Recognition */
+.integration-card.voice {
+    position: relative;
+}
+
+.voice-commands-list {
+    background: rgba(31, 41, 55, 1);
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 160px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.voice-commands-list .command-item {
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.voice-commands-list .command-label {
+    color: var(--text-dim);
+}
+
+.voice-commands-list .command-text {
+    color: var(--success);
+}
+
+.voice-toggle {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.voice-toggle.inactive {
+    background: var(--error);
+    color: white;
+}
+
+.voice-toggle.inactive:hover {
+    background: #dc2626;
+}
+
+.voice-toggle.active {
+    background: var(--success);
+    color: white;
+}
+
+.voice-toggle.active:hover {
+    background: #059669;
+}
+
+/* Import Data */
+.import-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.import-btn {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.import-btn.streamelements {
+    background: #ff6905;
+    color: white;
+}
+
+.import-btn.streamelements:hover {
+    background: #e55d04;
+}
+
+.import-btn.nightbot {
+    background: #5865f2;
+    color: white;
+}
+
+.import-btn.nightbot:hover {
+    background: #4752c4;
+}
+
+/* Info Section */
+.integrations-info {
+    margin-top: 2rem;
+}
+
+.integrations-info h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.info-item h4 {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.info-item p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.info-item a {
+    color: var(--purple-400);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.info-item a:hover {
+    color: var(--pink-400);
+    text-decoration: underline;
+}
+
+.info-item code {
+    background: rgba(31, 41, 55, 1);
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .integrations-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .integrations-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .integration-card {
+        padding: 1rem;
+    }
+    
+    .integration-icon {
+        font-size: 2rem;
+    }
+    
+    .integration-name {
+        font-size: 1.25rem;
+    }
+}
