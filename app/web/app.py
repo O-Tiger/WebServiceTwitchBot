@@ -9,9 +9,18 @@ from app.web.app_state import bot_manager
 from datetime import datetime
 import threading
 import time
+import os
+import secrets
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "twitch-bot-secret-key-2025"
+
+# Carregar SECRET_KEY de variável de ambiente (OBRIGATÓRIO em produção)
+app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY") or secrets.token_hex(32)
+
+# Avisar se usando chave gerada automaticamente
+if not os.getenv("FLASK_SECRET_KEY"):
+    print("⚠️  ATENÇÃO: Usando SECRET_KEY gerada automaticamente!")
+    print("⚠️  Defina FLASK_SECRET_KEY no .env para produção!")
 
 socketio.init_app(app)
 
