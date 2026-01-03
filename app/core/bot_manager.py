@@ -29,7 +29,12 @@ class BotManager:
         # ✅ ADICIONAR: Lock para thread safety
         self._callback_lock = threading.Lock()
 
-        # Carregar auto-respostas
+        # Inicializar banco de dados
+        from app.database.crud import BotDatabase
+
+        self.db = BotDatabase()
+
+        # Carregar auto-respostas do banco de dados
         self.auto_responses = self._load_auto_responses()
 
     def set_callbacks(self, on_message=None, on_status=None, on_log=None, on_raid=None):
@@ -219,49 +224,42 @@ class BotManager:
         return True
 
     def _load_auto_responses(self) -> dict:
-        """Carrega auto-respostas APENAS do arquivo separado"""
-        import json
-        import os
-
-        responses = {}
-
-        # Carregar APENAS de auto_responses.json
-        auto_file = "data/auto_responses.json"
-        if os.path.exists(auto_file):
-            try:
-                with open(auto_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    responses = data.get("responses", {})
-                    print(
-                        f"✅ {len(responses)} auto-respostas carregadas de {auto_file}"
-                    )
-            except Exception as e:
-                print(f"⚠️ Erro ao carregar {auto_file}: {e}")
-        else:
-            # Criar arquivo vazio se não existir
-            os.makedirs("data", exist_ok=True)
-            with open(auto_file, "w", encoding="utf-8") as f:
-                json.dump({"responses": {}}, f, indent=2, ensure_ascii=False)
-            print(f"📁 Arquivo {auto_file} criado")
-
-        return responses
+        """Carrega auto-respostas do banco de dados"""
+        try:
+            responses_list = self.db.auto_responses.get_all(
+                channel=None, enabled_only=False
+            )
+            responses = {}
+            for item in responses_list:
+                responses[item["trigger"]] = item["response"]
+            print(f"✅ {len(responses)} auto-respostas carregadas do banco de dados")
+            return responses
+        except Exception as e:
+            print(f"⚠️ Erro ao carregar auto-respostas: {e}")
+            return {}
 
     def _save_auto_responses(self):
-        """Salva auto-respostas APENAS no arquivo separado"""
-        import json
-        import os
-
-        os.makedirs("data", exist_ok=True)
-
-        auto_file = "data/auto_responses.json"
+        """Salva auto-respostas no banco de dados"""
         try:
-            with open(auto_file, "w", encoding="utf-8") as f:
-                json.dump(
-                    {"responses": self.auto_responses}, f, indent=2, ensure_ascii=False
+            for trigger, response in self.auto_responses.items():
+                # Verificar se existe
+                existing = self.db.auto_responses.get_by_trigger(
+                    trigger, channel=None
                 )
-            print(f"💾 Auto-respostas salvas em {auto_file}")
+                if existing:
+                    self.db.auto_responses.update(existing["id"], response=response)
+                else:
+                    self.db.auto_responses.create(
+                        trigger=trigger,
+                        response=response,
+                        channel=None,
+                        enabled=True,
+                    )
+            print(
+                f"💾 {len(self.auto_responses)} auto-respostas salvas no banco de dados"
+            )
         except Exception as e:
-            print(f"❌ Erro ao salvar {auto_file}: {e}")
+            print(f"❌ Erro ao salvar auto-respostas: {e}")
 
     def get_aggregated_stats(self) -> dict:
         """Retorna estatísticas agregadas de todos os canais"""
@@ -309,7 +307,39 @@ class BotManager:
         if self.on_log_callback:
             self._safe_callback(self.on_log_callback, level, message)
 
+    def import_user_points(self, username, points, channel=None):
+        """Importa pontos de um usuário para todos os bots ativos ou canal específico"""
+        username = username.lower()
 
+        # Se canal específico for informado
+        if channel and channel in self.bots:
+            bot = self.bots[channel]
+            if username in bot.user_points:
+                bot.user_points[username] += points
+            else:
+                bot.user_points[username] = points
+            bot.save_data()
+            print(f"✅ Importado para {channel}: {username} com {points} pontos")
+            return
+
+        # Caso contrário, adiciona para todos os bots ativos
+        for bot in self.bots.values():
+            if username in bot.user_points:
+                bot.user_points[username] += points
+            else:
+                bot.user_points[username] = points
+            bot.save_data()
+
+        # Também salvar no banco de dados para persistência
+        try:
+            # Usar primeiro canal disponível ou 'global'
+            target_channel = list(self.bots.keys())[0] if self.bots else 'global'
+            self.db.users.add_points(username, target_channel, points)
+        except Exception as e:
+            print(f"⚠️ Erro ao salvar no DB: {e}")
+
+        print(f"✅ Importado: {username} com {points} pontos")
+    
 class GUIWrapper:
     """Wrapper para simular interface GUI para TwitchBot"""
 

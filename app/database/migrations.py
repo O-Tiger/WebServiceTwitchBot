@@ -1,334 +1,323 @@
 """
-Script de Migração: JSON → SQLite
-Migra dados de bot_data.json e logs.json para banco de dados SQLite
-Localização: app/database/migrations.py
-
-Uso:
-    python -m app.database.migrations
+Script de Migração Automática
+Migra dados de JSON para SQLite
 """
 
 import json
 import os
 import sys
 from datetime import datetime
-from typing import Dict, List
+from pathlib import Path
 
-# Adicionar root ao path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+# Adicionar ao path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app.database.crud import BotDatabase
+from models import BotDataDB, LogsDB, init_databases
+from crud import UserCRUD, ChannelCRUD, UserPointsCRUD, AutoResponseCRUD, RaidCRUD
+from logs_crud import SystemLogCRUD, ChatMessageCRUD, EventCRUD
 
 
 class DataMigration:
-    """Gerenciador de migração de dados"""
-    
-    def __init__(self, data_dir: str = "data", backup: bool = True):
-        self.data_dir = data_dir
-        self.backup = backup
-        self.db = BotDatabase()
-        
-        # Arquivos fonte
-        self.bot_data_file = os.path.join(data_dir, "bot_data.json")
-        self.logs_file = os.path.join(data_dir, "logs.json")
-        self.auto_responses_file = os.path.join(data_dir, "auto_responses.json")
-        self.streamers_file = os.path.join(data_dir, "streamers.json")
-    
-    def run(self):
-        """Executa migração completa"""
-        print("=" * 60)
-        print("🔄 MIGRAÇÃO DE DADOS: JSON → SQLite")
-        print("=" * 60)
-        print()
-        
-        # Backup se solicitado
-        if self.backup:
-            self._create_backups()
-        
-        # Migrar cada tipo de dado
-        stats = {
-            'users': 0,
-            'messages': 0,
-            'auto_responses': 0,
-            'streamers': 0,
-            'errors': 0
+    """Classe para gerenciar migração de dados"""
+
+    def __init__(self):
+        self.data_dir = Path("data")
+        self.backup_dir = Path("data/backups")
+        self.backup_dir.mkdir(parents=True, exist_ok=True)
+
+        # Inicializar bancos
+        print("🔧 Inicializando bancos de dados...")
+        self.bot_db, self.logs_db = init_databases()
+
+        # Inicializar CRUDs
+        self.user_crud = UserCRUD(self.bot_db)
+        self.channel_crud = ChannelCRUD(self.bot_db)
+        self.points_crud = UserPointsCRUD(self.bot_db)
+        self.response_crud = AutoResponseCRUD(self.bot_db)
+        self.raid_crud = RaidCRUD(self.bot_db)
+        self.log_crud = SystemLogCRUD(self.logs_db)
+
+        self.stats = {
+            "users": 0,
+            "channels": 0,
+            "points_records": 0,
+            "auto_responses": 0,
+            "logs": 0,
+            "errors": 0,
         }
-        
-        # 1. Migrar dados de usuários (bot_data.json)
-        print("\n📊 Migrando dados de usuários...")
-        stats['users'] = self._migrate_bot_data()
-        
-        # 2. Migrar logs/mensagens (logs.json)
-        print("\n💬 Migrando histórico de mensagens...")
-        stats['messages'] = self._migrate_logs()
-        
-        # 3. Migrar auto respostas
-        print("\n🤖 Migrando auto respostas...")
-        stats['auto_responses'] = self._migrate_auto_responses()
-        
-        # 4. Migrar streamers
-        print("\n📺 Migrando configuração de streamers...")
-        stats['streamers'] = self._migrate_streamers()
-        
-        # Relatório final
-        self._print_report(stats)
-        
-        return stats
-    
-    def _create_backups(self):
-        """Cria backup dos arquivos JSON"""
-        print("💾 Criando backups...")
-        
-        backup_dir = os.path.join(self.data_dir, "backups")
-        os.makedirs(backup_dir, exist_ok=True)
-        
+
+    def backup_file(self, filepath: Path):
+        """Cria backup de um arquivo"""
+        if not filepath.exists():
+            return None
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
-        files = [
-            self.bot_data_file,
-            self.logs_file,
-            self.auto_responses_file,
-            self.streamers_file
-        ]
-        
-        for file_path in files:
-            if os.path.exists(file_path):
-                filename = os.path.basename(file_path)
-                backup_path = os.path.join(
-                    backup_dir, 
-                    f"{filename}.{timestamp}.backup"
-                )
-                
-                try:
-                    import shutil
-                    shutil.copy2(file_path, backup_path)
-                    print(f"   ✅ {filename} → {backup_path}")
-                except Exception as e:
-                    print(f"   ⚠️ Erro ao fazer backup de {filename}: {e}")
-    
-    def _migrate_bot_data(self) -> int:
-        """Migra bot_data.json (pontos e mensagens por usuário)"""
-        if not os.path.exists(self.bot_data_file):
-            print("   ⚠️ Arquivo bot_data.json não encontrado")
-            return 0
-        
+        backup_path = self.backup_dir / f"{filepath.stem}_{timestamp}{filepath.suffix}"
+
         try:
-            with open(self.bot_data_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            count = 0
-            
-            # Estrutura: { "channel": { "username": {"points": X, "messages": Y} } }
-            for channel, users in data.items():
-                if not isinstance(users, dict):
-                    continue
-                
-                for username, user_data in users.items():
-                    if not isinstance(user_data, dict):
-                        continue
-                    
-                    points = user_data.get('points', 0)
-                    messages = user_data.get('messages', 0)
-                    
-                    try:
-                        # Criar ou atualizar usuário
-                        user = self.db.users.get_or_create(username, channel)
-                        
-                        if user:
-                            self.db.users.update_points(username, channel, points)
-                            
-                            # Atualizar message_count manualmente
-                            with self.db.manager.get_connection() as conn:
-                                conn.execute(
-                                    """UPDATE users 
-                                       SET message_count = ?, 
-                                           updated_at = CURRENT_TIMESTAMP
-                                       WHERE username = ? AND channel = ?""",
-                                    (messages, username, channel)
-                                )
-                            
-                            count += 1
-                            print(f"   ✅ {channel}/{username}: {points} pts, {messages} msgs")
-                    
-                    except Exception as e:
-                        print(f"   ❌ Erro ao migrar {username}: {e}")
-            
-            return count
-        
+            import shutil
+
+            shutil.copy2(filepath, backup_path)
+            print(f"✅ Backup criado: {backup_path}")
+            return backup_path
         except Exception as e:
-            print(f"   ❌ Erro ao ler bot_data.json: {e}")
-            return 0
-    
-    def _migrate_logs(self) -> int:
-        """Migra logs.json (histórico de mensagens)"""
-        if not os.path.exists(self.logs_file):
-            print("   ⚠️ Arquivo logs.json não encontrado")
-            return 0
-        
+            print(f"❌ Erro ao criar backup de {filepath}: {e}")
+            return None
+
+    def load_json(self, filepath: Path):
+        """Carrega arquivo JSON"""
+        if not filepath.exists():
+            print(f"⚠️  Arquivo não encontrado: {filepath}")
+            return None
+
         try:
-            with open(self.logs_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            count = 0
-            
-            # Estrutura: lista de logs
-            logs = data if isinstance(data, list) else data.get('logs', [])
-            
-            for log_entry in logs:
-                try:
-                    # Extrair informações
-                    timestamp = log_entry.get('timestamp', '')
-                    message_text = log_entry.get('message', '')
-                    level = log_entry.get('level', 'info')
-                    
-                    # Tentar extrair canal e usuário da mensagem
-                    # Formato típico: "[canal] username: mensagem"
-                    channel = None
-                    username = None
-                    
-                    if '[' in message_text and ']' in message_text:
-                        parts = message_text.split(']', 1)
-                        if len(parts) == 2:
-                            channel = parts[0].strip('[').strip()
-                            rest = parts[1].strip()
-                            
-                            if ':' in rest:
-                                username_part, msg = rest.split(':', 1)
-                                username = username_part.strip()
-                                message_text = msg.strip()
-                    
-                    # Se conseguiu extrair informações válidas
-                    if channel and username and message_text:
-                        self.db.messages.create(
-                            username=username,
-                            channel=channel,
-                            message=message_text
-                        )
-                        count += 1
-                
-                except Exception as e:
-                    # Ignorar entradas inválidas silenciosamente
-                    pass
-            
-            print(f"   ✅ {count} mensagens migradas")
-            return count
-        
+            with open(filepath, "r", encoding="utf-8") as f:
+                return json.load(f)
         except Exception as e:
-            print(f"   ❌ Erro ao ler logs.json: {e}")
-            return 0
-    
-    def _migrate_auto_responses(self) -> int:
+            print(f"❌ Erro ao carregar {filepath}: {e}")
+            self.stats["errors"] += 1
+            return None
+
+    def migrate_bot_data(self):
+        """Migra bot_data.json"""
+        print("\n📦 Migrando bot_data.json...")
+
+        filepath = self.data_dir / "bot_data.json"
+        data = self.load_json(filepath)
+
+        if not data:
+            return
+
+        # Fazer backup
+        self.backup_file(filepath)
+
+        # Migrar dados por canal
+        for channel_name, channel_data in data.items():
+            try:
+                print(f"  📺 Processando canal: {channel_name}")
+
+                # Criar canal
+                channel_id = self.channel_crud.get_or_create(channel_name)
+                self.stats["channels"] += 1
+
+                # Migrar pontos
+                user_points = channel_data.get("user_points", {})
+                message_count = channel_data.get("message_count", {})
+
+                for username, points in user_points.items():
+                    messages = message_count.get(username, 0)
+
+                    # Criar usuário e atualizar pontos
+                    self.points_crud.update_user(
+                        username=username,
+                        channel_name=channel_name,
+                        points=points,
+                        messages=messages,
+                    )
+
+                    self.stats["users"] += 1
+                    self.stats["points_records"] += 1
+
+                print(f"    ✅ {len(user_points)} usuários migrados")
+
+            except Exception as e:
+                print(f"    ❌ Erro ao processar {channel_name}: {e}")
+                self.stats["errors"] += 1
+
+        print(f"✅ bot_data.json migrado com sucesso!")
+
+    def migrate_auto_responses(self):
         """Migra auto_responses.json"""
-        if not os.path.exists(self.auto_responses_file):
-            print("   ⚠️ Arquivo auto_responses.json não encontrado")
-            return 0
-        
-        try:
-            with open(self.auto_responses_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            responses = data.get('responses', {}) if isinstance(data, dict) else data
-            
-            count = 0
-            for trigger, response in responses.items():
+        print("\n📦 Migrando auto_responses.json...")
+
+        filepath = self.data_dir / "auto_responses.json"
+        data = self.load_json(filepath)
+
+        if not data:
+            return
+
+        # Fazer backup
+        self.backup_file(filepath)
+
+        responses = data.get("responses", {})
+
+        for trigger, response in responses.items():
+            try:
+                # Criar resposta global (channel_id = None)
+                self.response_crud.create(
+                    trigger=trigger, response=response, channel_id=None
+                )
+                self.stats["auto_responses"] += 1
+
+            except Exception as e:
+                print(f"  ❌ Erro ao migrar '{trigger}': {e}")
+                self.stats["errors"] += 1
+
+        print(f"✅ {len(responses)} auto-respostas migradas!")
+
+    def migrate_logs(self):
+        """Migra logs.json"""
+        print("\n📦 Migrando logs.json...")
+
+        filepath = self.data_dir / "logs.json"
+        data = self.load_json(filepath)
+
+        if not data:
+            return
+
+        # Fazer backup
+        self.backup_file(filepath)
+
+        logs = data if isinstance(data, list) else data.get("logs", [])
+
+        for log_entry in logs:
+            try:
+                self.log_crud.create(
+                    level=log_entry.get("level", "info"),
+                    message=log_entry.get("message", ""),
+                    channel=log_entry.get("channel"),
+                    username=log_entry.get("username"),
+                    extra_data=log_entry.get("extra_data"),
+                )
+                self.stats["logs"] += 1
+
+            except Exception as e:
+                print(f"  ❌ Erro ao migrar log: {e}")
+                self.stats["errors"] += 1
+
+        print(f"✅ {len(logs)} logs migrados!")
+
+    def migrate_streamers(self):
+        """Migra streamers.json (apenas referência)"""
+        print("\n📦 Verificando streamers.json...")
+
+        filepath = self.data_dir / "streamers.json"
+        if filepath.exists():
+            print(f"  ℹ️  streamers.json permanece no formato JSON")
+            print(f"  ℹ️  Use StreamerManager para gerenciar streamers")
+
+    def verify_migration(self):
+        """Verifica integridade da migração"""
+        print("\n🔍 Verificando migração...")
+
+        # Contar registros no banco
+        user_count = self.user_crud.count()
+        channel_count = len(self.channel_crud.list_all())
+        response_count = len(self.response_crud.list_all())
+
+        print(f"  👥 Usuários no banco: {user_count}")
+        print(f"  📺 Canais no banco: {channel_count}")
+        print(f"  🤖 Auto-respostas no banco: {response_count}")
+
+        # Verificar consistência
+        if user_count == 0 and self.stats["users"] > 0:
+            print("  ⚠️  Aviso: Migração pode ter falhado")
+            return False
+
+        print("  ✅ Migração verificada com sucesso!")
+        return True
+
+    def cleanup_old_files(self):
+        """Move arquivos antigos para pasta de backup"""
+        print("\n🧹 Limpando arquivos antigos...")
+
+        files_to_move = ["bot_data.json", "auto_responses.json", "logs.json"]
+
+        for filename in files_to_move:
+            filepath = self.data_dir / filename
+            if filepath.exists():
                 try:
-                    # Verificar se já existe
-                    existing = self.db.auto_responses.get_by_trigger(trigger)
-                    
-                    if not existing:
-                        self.db.auto_responses.create(
-                            trigger=trigger,
-                            response=response,
-                            channel=None,  # Global
-                            enabled=True
-                        )
-                        count += 1
-                        print(f"   ✅ {trigger} → {response}")
-                    else:
-                        print(f"   ⏭️ {trigger} já existe, pulando")
-                
+                    # Mover para backup
+                    new_path = self.backup_dir / f"{filename}.migrated"
+                    filepath.rename(new_path)
+                    print(f"  ✅ {filename} → backups/")
                 except Exception as e:
-                    print(f"   ❌ Erro ao migrar {trigger}: {e}")
-            
-            return count
-        
-        except Exception as e:
-            print(f"   ❌ Erro ao ler auto_responses.json: {e}")
-            return 0
-    
-    def _migrate_streamers(self) -> int:
-        """Migra streamers.json"""
-        if not os.path.exists(self.streamers_file):
-            print("   ⚠️ Arquivo streamers.json não encontrado")
-            return 0
-        
-        try:
-            with open(self.streamers_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            streamers = data.get('streamers', []) if isinstance(data, dict) else data
-            
-            count = 0
-            for streamer in streamers:
-                try:
-                    username = streamer.get('username')
-                    display_name = streamer.get('display_name', username)
-                    
-                    if not username:
-                        continue
-                    
-                    # Verificar se já existe
-                    if not self.db.streamers.exists(username):
-                        self.db.streamers.create(
-                            username=username,
-                            display_name=display_name,
-                            auto_connect=False,
-                            enabled=True
-                        )
-                        count += 1
-                        print(f"   ✅ {display_name} (@{username})")
-                    else:
-                        print(f"   ⏭️ {username} já existe, pulando")
-                
-                except Exception as e:
-                    print(f"   ❌ Erro ao migrar streamer: {e}")
-            
-            return count
-        
-        except Exception as e:
-            print(f"   ❌ Erro ao ler streamers.json: {e}")
-            return 0
-    
-    def _print_report(self, stats: Dict):
-        """Imprime relatório final"""
-        print("\n" + "=" * 60)
-        print("📊 RELATÓRIO DE MIGRAÇÃO")
-        print("=" * 60)
-        print(f"\n✅ Usuários migrados:      {stats['users']}")
-        print(f"✅ Mensagens migradas:     {stats['messages']}")
-        print(f"✅ Auto respostas:         {stats['auto_responses']}")
-        print(f"✅ Streamers:              {stats['streamers']}")
-        
-        if stats['errors'] > 0:
-            print(f"\n⚠️ Erros encontrados:      {stats['errors']}")
-        
-        print("\n" + "=" * 60)
-        print("✅ Migração concluída com sucesso!")
-        print("=" * 60)
-        print("\n💡 Os arquivos JSON originais foram mantidos como backup.")
-        print("   Você pode removê-los manualmente se desejar.\n")
+                    print(f"  ❌ Erro ao mover {filename}: {e}")
+
+    def print_summary(self):
+        """Imprime resumo da migração"""
+        print("\n" + "=" * 50)
+        print("📊 RESUMO DA MIGRAÇÃO")
+        print("=" * 50)
+        print(f"👥 Usuários migrados:      {self.stats['users']}")
+        print(f"📺 Canais migrados:        {self.stats['channels']}")
+        print(f"📊 Registros de pontos:    {self.stats['points_records']}")
+        print(f"🤖 Auto-respostas:         {self.stats['auto_responses']}")
+        print(f"📋 Logs migrados:          {self.stats['logs']}")
+        print(f"❌ Erros encontrados:      {self.stats['errors']}")
+        print("=" * 50)
+
+    def run(self, cleanup: bool = True, verify: bool = True):
+        """Executa migração completa"""
+        print("\n" + "=" * 50)
+        print("🚀 INICIANDO MIGRAÇÃO JSON → SQLite")
+        print("=" * 50)
+
+        # Migrar dados
+        self.migrate_bot_data()
+        self.migrate_auto_responses()
+        self.migrate_logs()
+        self.migrate_streamers()
+
+        # Verificar
+        if verify:
+            success = self.verify_migration()
+            if not success:
+                print("\n⚠️  Migração pode ter problemas. Verifique manualmente.")
+
+        # Limpar arquivos antigos
+        if cleanup:
+            response = input("\n🧹 Mover arquivos JSON antigos para backup? (s/N): ")
+            if response.lower() in ["s", "sim", "y", "yes"]:
+                self.cleanup_old_files()
+
+        # Resumo
+        self.print_summary()
+
+        print("\n✅ Migração concluída!")
+        print("\n💡 Dicas:")
+        print("  - Backups estão em: data/backups/")
+        print("  - Banco de dados: database/bot_data.db")
+        print("  - Logs: logs/logs.db")
+        print("  - Use os CRUDs em app/database/ para acessar dados")
 
 
 def main():
     """Função principal"""
+    print(
+        """
+    ╔════════════════════════════════════════════════════╗
+    ║                                                    ║
+    ║      🔄  MIGRAÇÃO DE DADOS JSON → SQLite          ║
+    ║                                                    ║
+    ╚════════════════════════════════════════════════════╝
+    
+    Este script irá:
+    ✓ Criar bancos de dados SQLite
+    ✓ Migrar bot_data.json
+    ✓ Migrar auto_responses.json
+    ✓ Migrar logs.json
+    ✓ Criar backups dos arquivos originais
+    ✓ Verificar integridade da migração
+    """
+    )
+
+    response = input("Deseja continuar? (S/n): ")
+    if response.lower() in ["n", "no", "nao", "não"]:
+        print("❌ Migração cancelada")
+        return
+
     try:
-        migration = DataMigration(data_dir="data", backup=True)
-        migration.run()
+        migration = DataMigration()
+        migration.run(cleanup=True, verify=True)
+
     except KeyboardInterrupt:
-        print("\n\n⚠️ Migração cancelada pelo usuário.\n")
+        print("\n\n⚠️  Migração interrompida pelo usuário")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Erro fatal na migração: {e}\n")
+        print(f"\n❌ Erro fatal durante migração: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

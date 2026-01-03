@@ -1,6 +1,8 @@
 """
 Sistema de Autenticação OAuth para múltiplos provedores
 Suporta: Google, Twitch, GitHub, Discord
+
+IMPORTANTE: oauth_config.json é mantido como JSON por conter credenciais sensíveis
 """
 
 import json
@@ -15,11 +17,11 @@ class OAuthConfig:
 
     def __init__(self, data_dir="data"):
         self.data_dir = data_dir
-        self.config_file = os.path.join(data_dir, "oauth_providers.json")
+        self.config_file = os.path.join(data_dir, "oauth_config.json")
         self.config = self.load_config()
 
     def load_config(self) -> Dict:
-        """Carrega configurações OAuth"""
+        """Carrega configurações OAuth do arquivo JSON"""
         try:
             if os.path.exists(self.config_file):
                 with open(self.config_file, "r", encoding="utf-8") as f:
@@ -32,7 +34,7 @@ class OAuthConfig:
             "google": {
                 "client_id": "",
                 "client_secret": "",
-                "redirect_uri": "http://127.0.0.1:5000/auth/google/callback",
+                "redirect_uri": "http://127.0.0.1:5000/oauth/google/callback",
                 "auth_uri": "https://accounts.google.com/o/oauth2/v2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
                 "user_info_uri": "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -41,7 +43,7 @@ class OAuthConfig:
             "twitch": {
                 "client_id": "",
                 "client_secret": "",
-                "redirect_uri": "http://127.0.0.1:5000/auth/twitch/callback",
+                "redirect_uri": "http://127.0.0.1:5000/oauth/twitch/callback",
                 "auth_uri": "https://id.twitch.tv/oauth2/authorize",
                 "token_uri": "https://id.twitch.tv/oauth2/token",
                 "user_info_uri": "https://api.twitch.tv/helix/users",
@@ -50,7 +52,7 @@ class OAuthConfig:
             "github": {
                 "client_id": "",
                 "client_secret": "",
-                "redirect_uri": "http://127.0.0.1:5000/auth/github/callback",
+                "redirect_uri": "http://127.0.0.1:5000/oauth/github/callback",
                 "auth_uri": "https://github.com/login/oauth/authorize",
                 "token_uri": "https://github.com/login/oauth/access_token",
                 "user_info_uri": "https://api.github.com/user",
@@ -59,7 +61,7 @@ class OAuthConfig:
             "discord": {
                 "client_id": "",
                 "client_secret": "",
-                "redirect_uri": "http://127.0.0.1:5000/auth/discord/callback",
+                "redirect_uri": "http://127.0.0.1:5000/oauth/discord/callback",
                 "auth_uri": "https://discord.com/api/oauth2/authorize",
                 "token_uri": "https://discord.com/api/oauth2/token",
                 "user_info_uri": "https://discord.com/api/users/@me",
@@ -68,7 +70,7 @@ class OAuthConfig:
         }
 
     def save_config(self):
-        """Salva configurações"""
+        """Salva configurações em JSON"""
         try:
             os.makedirs(self.data_dir, exist_ok=True)
             with open(self.config_file, "w", encoding="utf-8") as f:
@@ -255,10 +257,10 @@ OAUTH_TUTORIALS = {
             "3. Vá em 'APIs & Services' > 'Credentials'",
             "4. Clique em 'Create Credentials' > 'OAuth client ID'",
             "5. Escolha 'Web application'",
-            "6. Adicione o Redirect URI: http://127.0.0.1:5000/auth/google/callback",
+            "6. Adicione o Redirect URI: http://127.0.0.1:5000/oauth/google/callback",
             "7. Copie o Client ID e Client Secret",
         ],
-        "redirect_uri": "http://127.0.0.1:5000/auth/google/callback",
+        "redirect_uri": "http://127.0.0.1:5000/oauth/google/callback",
         "docs": "https://developers.google.com/identity/protocols/oauth2",
     },
     "twitch": {
@@ -267,13 +269,13 @@ OAUTH_TUTORIALS = {
             "1. Acesse: https://dev.twitch.tv/console/apps",
             "2. Clique em 'Register Your Application'",
             "3. Preencha o nome da aplicação",
-            "4. Adicione o OAuth Redirect URL: http://127.0.0.1:5000/auth/twitch/callback",
+            "4. Adicione o OAuth Redirect URL: http://127.0.0.1:5000/oauth/twitch/callback",
             "5. Escolha categoria: 'Application Integration'",
             "6. Clique em 'Create'",
             "7. Copie o Client ID",
             "8. Clique em 'New Secret' para gerar o Client Secret",
         ],
-        "redirect_uri": "http://127.0.0.1:5000/auth/twitch/callback",
+        "redirect_uri": "http://127.0.0.1:5000/oauth/twitch/callback",
         "docs": "https://dev.twitch.tv/docs/authentication",
     },
     "github": {
@@ -284,13 +286,13 @@ OAUTH_TUTORIALS = {
             "3. Preencha:",
             "   - Application name: Twitch Bot Dashboard",
             "   - Homepage URL: http://127.0.0.1:5000",
-            "   - Authorization callback URL: http://127.0.0.1:5000/auth/github/callback",
+            "   - Authorization callback URL: http://127.0.0.1:5000/oauth/github/callback",
             "4. Clique em 'Register application'",
             "5. Copie o Client ID",
             "6. Clique em 'Generate a new client secret'",
             "7. Copie o Client Secret (só aparece uma vez!)",
         ],
-        "redirect_uri": "http://127.0.0.1:5000/auth/github/callback",
+        "redirect_uri": "http://127.0.0.1:5000/oauth/github/callback",
         "docs": "https://docs.github.com/en/developers/apps/building-oauth-apps",
     },
     "discord": {
@@ -300,12 +302,12 @@ OAUTH_TUTORIALS = {
             "2. Clique em 'New Application'",
             "3. Dê um nome (ex: Twitch Bot Dashboard)",
             "4. Vá na aba 'OAuth2'",
-            "5. Adicione Redirect: http://127.0.0.1:5000/auth/discord/callback",
+            "5. Adicione Redirect: http://127.0.0.1:5000/oauth/discord/callback",
             "6. Copie o Client ID",
             "7. Clique em 'Reset Secret' para ver o Client Secret",
             "8. Copie o Client Secret",
         ],
-        "redirect_uri": "http://127.0.0.1:5000/auth/discord/callback",
+        "redirect_uri": "http://127.0.0.1:5000/oauth/discord/callback",
         "docs": "https://discord.com/developers/docs/topics/oauth2",
     },
 }

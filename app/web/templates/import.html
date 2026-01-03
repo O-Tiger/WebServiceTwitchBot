@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">📥 Importar Dados</h1>
+
+  <!-- StreamElements CSV -->
+  <div class="bg-gray-800 rounded-lg p-6 mb-6">
+    <div class="flex items-center mb-4">
+      <span class="text-4xl mr-4">📊</span>
+      <div>
+        <h2 class="text-xl font-bold">Importar StreamElements (CSV)</h2>
+        <p class="text-gray-400">Importe pontos do StreamElements</p>
+      </div>
+    </div>
+    
+    <form id="form-streamelements" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium mb-2">Arquivo CSV</label>
+        <input 
+          type="file" 
+          id="file-streamelements" 
+          accept=".csv"
+          class="block w-full text-sm text-gray-400
+                 file:mr-4 file:py-2 file:px-4
+                 file:rounded file:border-0
+                 file:text-sm file:font-semibold
+                 file:bg-orange-600 file:text-white
+                 hover:file:bg-orange-700 cursor-pointer"
+        />
+      </div>
+      <button 
+        type="submit"
+        class="bg-orange-600 hover:bg-orange-700 px-6 py-3 rounded-lg font-semibold transition w-full"
+      >
+        📤 Importar StreamElements
+      </button>
+    </form>
+    
+    <div id="result-streamelements" class="mt-4 hidden"></div>
+  </div>
+
+  <!-- Nightbot JSON -->
+  <div class="bg-gray-800 rounded-lg p-6 mb-6">
+    <div class="flex items-center mb-4">
+      <span class="text-4xl mr-4">🤖</span>
+      <div>
+        <h2 class="text-xl font-bold">Importar Nightbot (JSON)</h2>
+        <p class="text-gray-400">Importe comandos do Nightbot</p>
+      </div>
+    </div>
+    
+    <form id="form-nightbot" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium mb-2">Arquivo JSON</label>
+        <input 
+          type="file" 
+          id="file-nightbot" 
+          accept=".json"
+          class="block w-full text-sm text-gray-400
+                 file:mr-4 file:py-2 file:px-4
+                 file:rounded file:border-0
+                 file:text-sm file:font-semibold
+                 file:bg-purple-600 file:text-white
+                 hover:file:bg-purple-700 cursor-pointer"
+        />
+      </div>
+      <button 
+        type="submit"
+        class="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold transition w-full"
+      >
+        📤 Importar Nightbot
+      </button>
+    </form>
+    
+    <div id="result-nightbot" class="mt-4 hidden"></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/import.js') }}"></script>
+{% endblock %}

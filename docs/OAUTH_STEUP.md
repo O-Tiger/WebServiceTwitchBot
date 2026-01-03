@@ -33,11 +33,11 @@ O sistema OAuth permite que usuários façam login usando suas contas de:
 5. **Configure**:
    - Application type: `Web application`
    - Name: `Twitch Bot Dashboard`
-   - Authorized redirect URIs: `http://127.0.0.1:5000/auth/google/callback`
+   - Authorized redirect URIs: `http://127.0.0.1:5000/oauth/google/callback`
 6. **Copie**: Client ID e Client Secret
 
 #### Informações Importantes:
-- **Redirect URI**: `http://127.0.0.1:5000/auth/google/callback`
+- **Redirect URI**: `http://127.0.0.1:5000/oauth/google/callback`
 - **Scopes**: openid, email, profile
 - **Docs**: https://developers.google.com/identity/protocols/oauth2
 
@@ -51,14 +51,14 @@ O sistema OAuth permite que usuários façam login usando suas contas de:
 2. **Clique em**: Register Your Application
 3. **Preencha**:
    - Name: `Twitch Bot Dashboard`
-   - OAuth Redirect URLs: `http://127.0.0.1:5000/auth/twitch/callback`
+   - OAuth Redirect URLs: `http://127.0.0.1:5000/oauth/twitch/callback`
    - Category: `Application Integration`
 4. **Clique em**: Create
 5. **Copie**: Client ID
 6. **Gere Secret**: New Secret → Copie o Client Secret
 
 #### Informações Importantes:
-- **Redirect URI**: `http://127.0.0.1:5000/auth/twitch/callback`
+- **Redirect URI**: `http://127.0.0.1:5000/oauth/twitch/callback`
 - **Scopes**: user:read:email
 - **Docs**: https://dev.twitch.tv/docs/authentication
 
@@ -73,13 +73,13 @@ O sistema OAuth permite que usuários façam login usando suas contas de:
 3. **Preencha**:
    - Application name: `Twitch Bot Dashboard`
    - Homepage URL: `http://127.0.0.1:5000`
-   - Authorization callback URL: `http://127.0.0.1:5000/auth/github/callback`
+   - Authorization callback URL: `http://127.0.0.1:5000/oauth/github/callback`
 4. **Clique em**: Register application
 5. **Copie**: Client ID
 6. **Gere Secret**: Generate a new client secret → Copie (aparece só uma vez!)
 
 #### Informações Importantes:
-- **Redirect URI**: `http://127.0.0.1:5000/auth/github/callback`
+- **Redirect URI**: `http://127.0.0.1:5000/oauth/github/callback`
 - **Scopes**: read:user, user:email
 - **Docs**: https://docs.github.com/en/developers/apps/building-oauth-apps
 
@@ -93,12 +93,12 @@ O sistema OAuth permite que usuários façam login usando suas contas de:
 2. **Clique em**: New Application
 3. **Dê um nome**: `Twitch Bot Dashboard`
 4. **Vá em**: OAuth2
-5. **Adicione Redirect**: `http://127.0.0.1:5000/auth/discord/callback`
+5. **Adicione Redirect**: `http://127.0.0.1:5000/oauth/discord/callback`
 6. **Copie**: Client ID
 7. **Reset Secret**: Para ver o Client Secret → Copie
 
 #### Informações Importantes:
-- **Redirect URI**: `http://127.0.0.1:5000/auth/discord/callback`
+- **Redirect URI**: `http://127.0.0.1:5000/oauth/discord/callback`
 - **Scopes**: identify, email
 - **Docs**: https://discord.com/developers/docs/topics/oauth2
 
@@ -184,7 +184,7 @@ app/
   "google": {
     "client_id": "SEU_CLIENT_ID_AQUI",
     "client_secret": "SEU_CLIENT_SECRET_AQUI",
-    "redirect_uri": "http://127.0.0.1:5000/auth/google/callback",
+    "redirect_uri": "http://127.0.0.1:5000/oauth/google/callback",
     // ... outras configurações
   }
 }
@@ -198,7 +198,7 @@ Ao colocar em produção:
 
 1. **Atualize os Redirect URIs** para usar HTTPS:
    ```
-   https://seudominio.com/auth/google/callback
+   https://seudominio.com/oauth/google/callback
    ```
 
 2. **Reconfigure nos Provedores**:
